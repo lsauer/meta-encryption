@@ -1,0 +1,453 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Meta-encryption: Safer encryption through averaging the weaknesses of singular ciphers / An HTML5 2D-Canvas tutorial by lsauer.com, 2011 (bootstrap-updated 2013)</title>   <meta name="author" content="Lorenz Lo Sauer" />
+  <link href="https://plus.google.com/107612997855711957528/" rel="publisher" />
+  <link type="text/css" rel="stylesheet" href="res/css/bootstrap.css"/>
+  <link type="text/css" rel="stylesheet" href="res/css/slider.css"/>
+  <script type="text/javascript" src="res/js/islib-custom.js"></script>
+  <style>
+	  section.main{
+		margin:10px;	  
+	}
+	.bs-fieldset {
+		position: relative;
+		margin: 15px 0;
+		padding: 39px 19px 14px;
+		background-color: #fff;
+		border: 1px solid #ddd;
+		-webkit-border-radius: 4px;
+		-moz-border-radius: 4px;
+		border-radius: 4px;
+	}
+	.fieldset-float {
+		z-index: 1;
+		float: left;
+		display: block;
+		margin-right: 20px;		
+	}
+	.bs-fieldset:after {
+		position: absolute;
+		top: -1px;
+		left: -1px;
+		padding: 3px 7px;
+		font-size: 12px;
+		font-weight: bold;
+		background-color: #f5f5f5;
+		border: 1px solid #ddd;
+		color: #9da0a4;
+		-webkit-border-radius: 4px 0 4px 0;
+		-moz-border-radius: 4px 0 4px 0;
+		border-radius: 4px 0 4px 0;
+	}
+	/* Contains various label-texts. naming scheme: pseudoeffect-labelname*/
+	.after-words:after {
+		content: "Words";
+	}
+	.after-wordtable:after {
+		content: "Wordtable";
+	}
+	.after-hashtable:after {
+		content: "Ciphers";
+	}
+	.after-navigation:after {
+		content: "Title";
+	}
+  </style>
+</head>
+<body onLoad="cvsdemo.initLoad();">
+<section class="main">
+<a name="top"></a>
+<div class="bs-fieldset after-navigation">
+    <ul class="nav nav-list" style="width:200px; float:right;">
+      <li class="active"><a href="#top"><i class="icon-info-sign"></i> Info</a></li>
+      <li><a href="#words"><i class="icon-home icon-white"></i> Words</a></li>
+      <li><a href="#table"><i class="icon-book"></i> Table</a></li>
+      <li><a href="#inputtext"><i class="icon-pencil"></i> Textinput</a></li>
+    </ul>
+
+
+    <blockquote>
+      <p><strong>Meta-Encryption Step #1:</strong> Calculate a number from a password, and demonstrate a random distribution.</p>
+      <small>Words are mapped to numbers, which in turn determine an encryption-algorithm from a static list. Author: <cite title="Follow @sauerlo">@sauerlo</cite> 2011, 2013</small>
+    </blockquote>
+
+<br><br><br>
+<div class="alert alert-info">
+    <button type="button" class="close" data-dismiss="alert">×</button>
+    <p><br>
+    User passwords are generally not safe and are chosen pragrammatically and oportunistically, rather than randomly.<sup>[1]</sup> Likewise service providers frequently make pragmatic and opportunistic choices, thus potentially contributing to the widespread use of weak hash-functions.<sup>[2]</sup> </p>
+    <p>A barrier to brute force attacks on hash-functions is imposed, when the hashing-function is initially unknown. This may be realized by using a random cipher from a static list of well-behaved hash-functions. The use of arbitarily choosing encryption-functions, throughout the encryption process, thwarts the attempt of determining the hashing-function through entropic cues (See <sup>[3]</sup>), revealed by readily available cryptanalysis software.   </p>
+    <p>Thus, to mitigate the success of brute force attacks on weak passwords with weak hash-functions, the weak password may be used to determine an initial encryption algorithm from a set of 12  or more secure encryption algorithms. During the process of encryption, algorithms may be switched in an order that is determined  by the number that determined the initial algorithm.</p>
+    <p><strong>Demo:</strong></p>
+    <p>The number of algorithms in the list can be set with the slider above the text-field. Still demonstrated has to be, that any  (pass)word  determines the chosen algorithm <strong>randomly</strong>.</p>
+    <p>Both parties, that is receiver and sender, of the encrypted message need to have the same static table of algorithms to choose from. With no prior information, a brute-force attacker will not be aware which hashing algorithm was chosen, as the choice is solely dependant on the user-password, and may be as simple as each byte added up MODULO (%) the number of hash algorithms in an array: 
+      <code>CharacterValuesSum(plainpassword) % CipherTableCount</code>
+    <p><br>
+      <strong>Process Illustration: </strong>    
+    <p>
+        <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true" onClick="$('#img-processillustration').toggle();">Show illustration</button><br>
+      <img id="img-processillustration" src="res/img/meta-encryption.png" alt="Showing the process of meta encryption in a demonstration example with a potential hacker" style="display:none; margin:10px; zoom:0.8"><br>
+      <strong>Randomness: </strong>    
+
+    <br>
+    <p>Whilst in principle any other monotonous function may be used to derive a number from an arbitrary password, adding up the character values works well in terms of randomness. This is demonstrated below,  with a list of over 2 Million  actual user-passwords. The generated files, which contain number-reduced password-values, as described above, are available in the <code>res/data/</code> folder.<br>
+<img src="res/img/pwdords_mod12.png" alt="mapped ordinal value of the password"><br><br>
+      <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true" onClick="$('#pre-hist1rcode').toggle();">Show R-Code</button><br>
+      
+    <pre id="pre-hist1rcode" tabindex="0" style="display:none;">pwdords = scan("c:/!work/Databases/passwords_ordinals_12.txt") #read into a vector<br>
+> summary(dat)   
+ Min.   : 0.000  
+ 1st Qu.: 2.000  
+ Median : 6.000
+ Mean   : 5.492  #perfect
+ 3rd Qu.: 8.000  
+ Max.   :11.000 
+
+hist(pwdord, col="orange", main="Histogram of Ordinal values", <br>xlab="mapped ordinal value of the password")</pre>
+
+You can get my concise primer for R, <a href="http://www.lsauer.com/2012/05/scalable-web-application-development.html#.UX1K06nZCw4" ref="_new">here</a>.
+<p>    
+    <p><br>
+      <strong>References: </strong><br>
+    <ul><li>
+      [1] <em>The battle against phishing: Dynamic Security Skins</em>, R. Dhamija,J. D. Tygar, 2005 SOUPS '05 Proceedings, pg 77-88
+      </li>
+        <li>[2]<em> Attacks on hash functions and applications</em>, Stevens, M.M.J., 2012, Doctoral Thesis, Leiden University</li>
+        <li>[3] Entropic Security and the encryption of high-entropy messages, Y. Dodis and A. Smith., Theory of Cryptography Conference (TCC) 2005.</li>
+      </ul>
+
+<br>
+    </p>
+    <p>For natural language vocubularies go to:<br />
+    </p>
+    <ul>
+      <li><a href="https://github.com/lsauer/Data-Hub">https://github.com/lsauer/Data-Hub</a></li>
+        <li><a href="http://wordnet.princeton.edu/wordnet/download/">http://wordnet.princeton.edu/wordnet/download/</a></li>
+    </ul>
+</div>
+</div>
+<a name="words"></a>
+<div class="bs-fieldset fieldset-float after-words" style="width: 32%;">
+  <div>
+    <canvas id="cvxpie" width="300" height="240" style="display:none;"> This text is displayed if your browser does not support HTML5 Canvas. </canvas>
+  </div>
+</div>
+
+<a name="table"></a>
+<div class="bs-fieldset fieldset-float after-wordtable" style="width: auto; clear: right;">
+<table class="table" id="table-top-words">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>word</th>
+                  <th>count</th>
+                  <th>percent</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td>Mark</td>
+                  <td>1</td>
+                  <td>0%</td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td>Jacob</td>
+                  <td>2</td>
+                  <td>1%</td>
+                </tr>
+              </tbody>
+            </table>
+</div>
+
+<div class="bs-fieldset fieldset-float after-hashtable" style="width: auto; clear: right;">
+            <table class="table" id="table-top-words">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Algorithm</th>
+                  <th>speed</th>
+                  <th>#</th>
+                  <th>Algorithm</th>
+                  <th>speed</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td>AES 1024</td>
+                  <td>++</td>
+                  <td>6</td>
+                  <td>IDEA</td>
+                  <td>+</td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td>AES 2048</td>
+                  <td>+</td>
+                  <td>7</td>
+                  <td>RC4</td>
+                  <td>+++</td>
+                </tr>
+                <tr>
+                  <td>3</td>
+                  <td>Blowfish 256</td>
+                  <td>+</td>
+                  <td>8</td>
+                  <td>RC6</td>
+                  <td>++</td>
+                </tr>
+                <tr>
+                  <td>4</td>
+                  <td>Twofish 256</td>
+                  <td>++</td>
+                  <td>9</td>
+                  <td>Threefish</td>
+                  <td>+++</td>
+                </tr>
+                <tr>
+                  <td>5</td>
+                  <td>DES</td>
+                  <td>+</td>
+                  <td>10</td>
+                  <td>TEA</td>
+                  <td>+++</td>
+                </tr>
+              </tbody>
+            </table>
+</div>
+
+<a name="inputtext"></a>
+<div class="bs-fieldset after-words" style="clear:both;">
+  <div>
+        <label for="modulo"> Set Modulo &nbsp;
+          <input id="modulo-slider" type="range" min="0" max="22" step="2" value="6" data-slider-min="0" data-slider-max="22" data-slider-step="2" data-slider-value="6" data-slider-orientation="horizontal" data-slider-selection="after" data-slider-tooltip="hide" >&nbsp;&nbsp;
+          <input id="modulo" type="text" value="6" style="width: 18px;" onChange="this.previousElementSibling.value = this.value; cvsdemo.plotData();">
+          </input>
+        </label>
+        <br>
+        <label for="loadurl"> Set URL: <button type="button" class="btn" onClick="cvsdemo.loadText()">Load</button>
+          <input id="loadurl" type="text" value="http://lsauer.github.com/meta-encryption/res/data/dictionary_words_enUS.txt" title="type the url of the dictionary to load..." style="width:50%; margin: 2px !important;">
+          </input>
+        </label>
+         
+    </input>
+        <br>
+        <code>Double click in the textfield to re-render the plot distribution:</code><br>
+        <textarea  id="words" style="height:300px; width:98%;" onDblClick="cvsdemo.plotData();">
+         ### Shakespear: Hamlet
+         ======================
+        (This text only serves as a contrast)
+        ACT I
+        SCENE I. Elsinore. A platform before the castle.
+        
+        FRANCISCO at his post. Enter to him BERNARDO 
+        BERNARDO 
+        Who's there?
+        FRANCISCO 
+        Nay, answer me: stand, and unfold yourself.
+        BERNARDO 
+        Long live the king!
+        FRANCISCO 
+        Bernardo?
+        BERNARDO 
+        He.
+        FRANCISCO 
+        You come most carefully upon your hour.
+        BERNARDO 
+        'Tis now struck twelve; get thee to bed, Francisco.
+        FRANCISCO 
+        For this relief much thanks: 'tis bitter cold,
+        And I am sick at heart.
+        BERNARDO 
+        Have you had quiet guard?
+        FRANCISCO 
+        Not a mouse stirring.
+        BERNARDO 
+        Well, good night.
+        If you do meet Horatio and Marcellus,
+        The rivals of my watch, bid them make haste.
+        FRANCISCO 
+        I think I hear them. Stand, ho! Who's there?
+        
+        Enter HORATIO and MARCELLUS
+        HORATIO 
+        Friends to this ground.
+        MARCELLUS 
+        And liegemen to the Dane.
+        FRANCISCO 
+        Give you good night.
+        MARCELLUS 
+        O, farewell, honest soldier:
+        Who hath relieved you?
+        FRANCISCO 
+        Bernardo has my place.
+        Give you good night.
+        
+        Exit
+        MARCELLUS 
+        Holla! Bernardo!
+        BERNARDO 
+        Say,
+        What, is Horatio there?
+        HORATIO 
+        A piece of him.
+        BERNARDO 
+        Welcome, Horatio: welcome, good Marcellus.
+        MARCELLUS 
+        What, has this thing appear'd again to-night?
+        BERNARDO 
+        I have seen nothing.
+        MARCELLUS 
+        Horatio says 'tis but our fantasy,
+        And will not let belief take hold of him
+        Touching this dreaded sight, twice seen of us:
+        Therefore I have entreated him along
+        With us to watch the minutes of this night;
+        That if again this apparition come,
+        He may approve our eyes and speak to it.
+        HORATIO 
+        Tush, tush, 'twill not appear.
+        </textarea >
+  </div>
+</div>
+  
+  
+  <script type="text/javascript">
+
+// Global containment
+// -----
+(function() {
+    
+    // Module Setup
+    // -----
+    
+    // Define the internal cvsdemo object
+    var cvsdemo = {};
+    
+    // Export the cvsdemo object as either a CommonJS module, or as a global object
+    if (typeof module !== 'undefined' && module.exports) {
+        module.exports = cvsdemo;
+    } else {
+        this.cvsdemo = cvsdemo;
+    }
+
+	cvsdemo.initLoad = function(){
+		var ecvs = document.getElementById("cvxpie");
+		ecvs.style.display = 'block';
+		cvsdemo.plotData();	
+	
+		$('#modulo-slider').slider()
+		  .on('slide', function(ev){
+				$('#modulo').val(this.value);
+				cvsdemo.plotData();
+		  }
+		);
+	}
+	
+	//@param modulo {Int}: any Integer, e.g. the numer of Cipher-Algorithms available in a static table
+	cvsdemo.getModulo = function (word, modulo){
+		algoNum = word.split("").map( function(a){ return String(a).charCodeAt();} )
+								.reduce( //alternatively  return (''+a).charCodeAt(); -> invokes a.toString()
+				function(a,b){
+				//console.log("a is %s and b is %s", a,b);
+					return a+b;
+				}, 0 //initial value to 0
+		) % modulo; //any other suitable operator may be chosen as well
+		return algoNum;
+	}
+	
+	
+	//function is an import from islib
+	cvsdemo.stripws = function (s){ return s.replace(/[^\w\s]|_/g, "").replace(/\s+/g, " ");}
+	
+	//count the words, crate a word-histogram and update the wordcount-table
+	cvsdemo.processWords = function (mod){
+		var _words = document.getElementById('words').value						//attrib. 'value' not 'innerText', in Chrome/webkit
+					.replace(/\s+/g,"\t").split("\t")
+					.map(function(e,i,a){return cvsdemo.stripws(e).toLowerCase();}), 
+			_count = gist.arrayInitialize(mod, 0);
+		//for each word calculate, its ordinal representation % FIXEDNUMBER
+		var wrdhist = {};
+		for(var i=0; i<_words.length; i++){
+			//crate a word-histogram to be displayed in the table
+			wrdhist[_words[i]] = typeof wrdhist[_words[i]] === 'undefined' ? 1 : wrdhist[_words[i]]+1;
+			_count[ cvsdemo.getModulo(_words[i], mod) ]++;
+		};
+		var totalcount = i;
+		//get the maximum word frequency
+		var wrdmax = Math.max.apply(null, gist.Values(wrdhist) );
+	
+		//update the table with the top 6 most frequent words
+		var tablemaxrows = 5;
+		var wrdstop = gist.sortDict(wrdhist,null,null,'numdescInt').slice(0, tablemaxrows);
+						//.slice(0,6).map(function(e,i,a){var splt=e.split(/;/), o ={}; o[splt[0]] = splt[1]; return o;})
+		for(var j =0, html='';j<tablemaxrows;j++){
+			var asplt = wrdstop[j].split(/;/);
+			html += ('<tr><td>'+j+'</td><td>'+asplt[1]
+					 +'</td><td>'+parseInt(asplt[0])
+					 +'</td><td>'+((asplt[0]/totalcount)*100).toFixed(2)+'%</td></tr>\n'
+			);
+		}
+		$('#table-top-words > tbody:last').html(html);
+		//add total count:
+		_count.push(totalcount);
+		return _count;
+	}
+	//sums the total word count from a word-histogram/dictionary
+	cvsdemo.getTotal = function (myData){
+		var myTotal = 0;
+		for (var j = 0; j < myData.length; j++) {
+			myTotal += (typeof myData[j] == 'number') ? myData[j] : 0;
+		}
+		return myTotal;
+	}
+	
+	//create a 2D Canvas and plot a pie-chart
+	cvsdemo.plotData = function c() {
+		var canvas;
+		var ctx;
+		var lastend = 0;
+		var modulo = parseInt(document.getElementById("modulo").value);
+		var myData = cvsdemo.processWords(modulo);
+		var myTotal = myData.pop(); //get the total word count
+		var myColor = ["#ECD078","#D95B43","#C02942","#542437","#53777A"]; //The pie-slice colors to alternate between.
+		
+		canvas = document.getElementById("cvxpie");
+		var size = { x:canvas.width / 2, y:canvas.height / 2};
+		ctx = canvas.getContext("2d");
+		ctx.clearRect(0, 0, canvas.width, canvas.height); //clears the cvs
+		console.log("Total number of words:",  myTotal)
+
+		for (var i = 0; i < myData.length; i++) {
+			ctx.fillStyle = myColor[i%myColor.length];
+			ctx.beginPath();
+			ctx.moveTo(size.x, size.y);
+			ctx.arc(size.x, size.y, size.y,lastend,lastend+
+			  (Math.PI*2*(myData[i]/myTotal)),false);
+			ctx.lineTo(size.x, size.y);
+			ctx.fill();
+			lastend += Math.PI*2*(myData[i]/myTotal);
+		}
+	}
+	
+	cvsdemo.loadText = function (){
+		$('#words').load( $('#loadurl')[0].value );
+	}
+})()
+
+</script> 
+<script type="text/javascript" src="res/js/jquery-2.0.0.min.js"></script>
+<script type="text/javascript" src="res/js/bootstrap.js"></script>
+<script type="text/javascript" src="res/js/bootstrap-slider.js"></script>
+
+<script type="text/javascript">
+    var APP_BASE="http://metgate.org";
+</script>
+
+</section>
+</body>
+</html>
