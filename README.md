@@ -1,6 +1,6 @@
 meta-encryption
 ===============
-##### *Safer encryption by averaging over the weaknesses of singular ciphers*
+##### *Safer encryption by averaging the weaknesses of singular ciphers*
 
 ---
 
